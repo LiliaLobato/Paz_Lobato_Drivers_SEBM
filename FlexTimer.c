@@ -35,14 +35,14 @@ void FlexTimer_update_mod_value(uint16_t FTM_channel, float frecuency_scaler)
 uint32_t FlexTimer_get_mod(uint32_t output_frecuency, float frecuency_scaler)
 {
 	uint32_t mod = 0;
-	mod = (uint32_t)(((CLK_FRECUENCY_DIVIDED_BY_TWO_MASK)/(FLEX_TIMER_PRESCALER1_DIRECT_VALUE_MASK*output_frecuency*frecuency_scaler))-1);
+	mod = (uint32_t)(((CLK_FRECUENCY_DIVIDED_BY_TWO)/(FLEX_TIMER_PRESCALER1_DIRECT_VALUE*output_frecuency*frecuency_scaler))-1);
 	return mod;
 }
 
 uint32_t FlexTimer_get_output_frecuency(uint16_t FTM_channel)
 {
 	uint32_t output_frecuency = 0;
-	output_frecuency = ((CLK_FRECUENCY_DIVIDED_BY_TWO_MASK)/((FLEX_TIMER_PRESCALER1_DIRECT_VALUE_MASK)*(FTM0->MOD + 1)));
+	output_frecuency = ((CLK_FRECUENCY_DIVIDED_BY_TWO)/((FLEX_TIMER_PRESCALER1_DIRECT_VALUE)*(FTM0->MOD + 1)));
 	return output_frecuency;
 }
 

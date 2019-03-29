@@ -41,6 +41,10 @@ typedef enum {
 #define FLEX_TIMER_PS_32    (5U)
 #define FLEX_TIMER_PS_64    (6U)
 #define FLEX_TIMER_PS_128    (7U)
+#define FLEX_TIMER_PRESCALER1_DIRECT_VALUE (1U)
+
+#define CLK_FRECUENCY_DIVIDED_BY_TWO (10500000U) //10.5 MHz
+#define MOD_255_VALUE 0xFF
 
 void FlexTimer_Init();
 void Compare_init(uint32_t mod, uint32_t cnv,

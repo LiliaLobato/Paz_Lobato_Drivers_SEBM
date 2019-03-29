@@ -13,6 +13,7 @@
 #include "NVIC.h"
 #include "Motor.h"
 #include "RGB.h"
+#include "Bits.h"
 
 #define SYSTEM_CLOCK (21000000U)
 #define DELAY5H (0.2F)

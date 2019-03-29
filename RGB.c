@@ -8,6 +8,12 @@
 #include "RGB.h"
 #include "MK64F12.h"
 #include "GPIO.h"
+#include "Bits.h"
+#include "NVIC.h"
+#include "PIT.h"
+
+#define SYSTEM_CLOCK (21000000U)
+#define DELAYLED (0.50F)
 
 gpio_pin_control_register_t RGB_input_intr_config = GPIO_MUX1;	//Configuración del GPIO
 
@@ -92,11 +98,109 @@ void RGB_purple_off(void) {
 	RGB_blue_off();
 }
 
-//genera un delay de tiempo X al ejecutar un nop n veces
-void delay(uint32_t delay) {
-	volatile uint32_t counter;
-
-	for (counter = delay; counter > 0; counter--) {
-		__asm("nop");
+//Permite encender y apagar cada color sin importar el estado previo
+void encender_led(led_color led) {
+	switch (led) {
+	case COLOR_GREEN:
+		RGB_white_off();
+		RGB_green_on();
+		break;
+	case COLOR_BLUE:
+		RGB_white_off();
+		RGB_blue_on();
+		break;
+	case COLOR_PURPLE:
+		RGB_white_off();
+		RGB_purple_on();
+		break;
+	case COLOR_RED:
+		RGB_white_off();
+		RGB_red_on();
+		break;
+	case COLOR_YELLOW:
+		RGB_white_off();
+		RGB_yellow_on();
+		break;
+	case COLOR_WHITE:
+		RGB_white_off();
+		RGB_white_on();
+		break;
+	default:
+		break;
 	}
+}
+
+//Permite configurar un puerto como output para un led externo
+
+void RGB_extern_output_config(gpio_port_name_t portName, uint8_t pin) {
+	gpio_pin_control_register_t pin_control_register_bit_d_0 = GPIO_MUX1;
+	GPIO_clock_gating(portName);
+	GPIO_pin_control_register(portName, pin, &pin_control_register_bit_d_0);
+	GPIO_data_direction_pin(portName, GPIO_OUTPUT, pin);
+	GPIO_set_pin(portName, pin);
+}
+
+//Genera una interrupción para el toogle
+void RGB_PIT_config1s() {
+	PIT_clock_gating();
+	PIT_enable();
+	NVIC_set_basepri_threshold(PRIORITY_12);
+	NVIC_enable_interrupt_and_priotity(PIT_CH2_IRQ, PRIORITY_3);
+	NVIC_global_enable_interrupts;
+	PIT_delay(PIT_2, SYSTEM_CLOCK, DELAYLED);
+	PIT_enable_interrupt_2(PIT_2);
+}
+
+void RGB_2toogle_1s(gpio_port_name_t portName, uint8_t pin) {
+	uint8_t i = 3;
+	uint8_t pit_inter_status = FALSE;
+	led_status flag_led = LED_ON;
+
+	RGB_extern_output_config(portName, pin);
+	RGB_PIT_config1s();
+	GPIO_clear_pin(portName, pin);
+	for (i = 3; i != 0; i--) {
+		do {
+			pit_inter_status = PIT_get2_interrupt_flag_status();
+		} while (FALSE == pit_inter_status);
+
+		if (LED_ON == flag_led) {
+			GPIO_set_pin(portName, pin);
+			flag_led = LED_OFF;
+		} else {
+			GPIO_clear_pin(portName, pin);
+			flag_led = LED_ON;
+		}
+
+		PIT_clear2_interrupt_flag();
+
+	}
+}
+
+//estados
+void RGB_estado1(gpio_port_name_t portName1, uint8_t pin1,
+		gpio_port_name_t portName2, uint8_t pin2) {
+	RGB_extern_output_config(portName1, pin1);
+	RGB_extern_output_config(portName2, pin2);
+	GPIO_set_pin(portName1, pin1);
+	GPIO_set_pin(portName2, pin2);
+	GPIO_clear_pin(portName2, pin2);
+}
+
+void RGB_estado2(gpio_port_name_t portName1, uint8_t pin1,
+		gpio_port_name_t portName2, uint8_t pin2) {
+	RGB_extern_output_config(portName1, pin1);
+	RGB_extern_output_config(portName2, pin2);
+	GPIO_set_pin(portName1, pin1);
+	GPIO_set_pin(portName2, pin2);
+	GPIO_clear_pin(portName1, pin1);
+}
+void RGB_estado3(gpio_port_name_t portName1, uint8_t pin1,
+		gpio_port_name_t portName2, uint8_t pin2) {
+	RGB_extern_output_config(portName1, pin1);
+	RGB_extern_output_config(portName2, pin2);
+	GPIO_set_pin(portName1, pin1);
+	GPIO_set_pin(portName2, pin2);
+	GPIO_clear_pin(portName1, pin1);
+	GPIO_clear_pin(portName2, pin2);
 }
