@@ -49,4 +49,8 @@ void Compare_init(uint32_t mod, uint32_t cnv,
 void PWM_init_p(ft_mode mode);
 void Capture_init(ft_mode mode);
 
+void FlexTimer_update_channel_value(uint16_t channel_value);
+void FlexTimer_update_mod_value(uint16_t FTM_channel, float frecuency_scaler);
+uint32_t FlexTimer_get_mod(uint32_t output_frecuency, float frecuency_scaler);
+uint32_t FlexTimer_get_output_frecuency(uint16_t FTM_channel);
 #endif /* FLEXTIMER_H_ */
