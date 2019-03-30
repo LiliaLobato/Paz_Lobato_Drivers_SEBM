@@ -15,6 +15,8 @@
 #include "Delay.h"
 #include "Pantalla.h"
 
+#define BOTONMAX 9
+
 /*! This array hold the initial picture that is shown in the LCD. Note that extern should be avoided*/
 const uint8_t inicio[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFC, 0xFC, 0xFC,
@@ -141,13 +143,12 @@ void pantalla_RGB_Manual() {
 	LCD_nokia_goto_xy(0, 3);
 	LCD_nokia_send_string(&menu1[0]);
 }
-void pantalla_RGB_ADC(float Pot){//uint8_t entero, uint8_t decimal) {
+void pantalla_RGB_ADC(float Pot) {	//uint8_t entero, uint8_t decimal) {
 	LCD_nokia_clear();/*! It clears the information printed in the LCD*/
 	//Genera el valor
 	uint8_t PotR = (uint8_t) Pot;
-	uint8_t PotD0 = (uint8_t) ((Pot-PotR)*10);
-	uint8_t PotD1 = (uint8_t) ((Pot-PotR)*100)-(PotD0*10);
-
+	uint8_t PotD0 = (uint8_t) ((Pot - PotR) * 10);
+	uint8_t PotD1 = (uint8_t) ((Pot - PotR) * 100) - (PotD0 * 10);
 	//Desplegar Pantalla
 	LCD_nokia_goto_xy(0, 1);
 	LCD_nokia_send_string("VOLTAJE");
@@ -161,35 +162,67 @@ void pantalla_RGB_ADC(float Pot){//uint8_t entero, uint8_t decimal) {
 	LCD_nokia_goto_xy(0, 4);
 	LCD_nokia_send_string("SW2=OFF");
 }
-void pantalla_RGB_Secuencial() {
-
+void pantalla_RGB_Secuencial(RGB_Bn Boton, uint8_t BotonCounter) {
+	//BotonCounter va de 0 a 9, 0 es el primer Boton presionado, 9 es el último
+	uint8_t flag_char = FALSE;
+	if(0==BotonCounter){
+		LCD_nokia_clear();/*! It clears the information printed in the LCD*/
+		LCD_nokia_goto_xy(0, 3);
+		flag_char = TRUE;
+	}
+	switch (Boton) {
+	case B1:
+		LCD_nokia_send_string("Z");
+		break;
+	case B2:
+		LCD_nokia_send_string("R");
+		break;
+	case B3:
+		LCD_nokia_send_string("V");
+		break;
+	case B4:
+		LCD_nokia_send_string("A");
+		break;
+	case B5:
+		LCD_nokia_send_string("M");
+		break;
+	case B6:
+		LCD_nokia_send_string("B");
+		break;
+	default:
+		break;
+	}
+	if(BOTONMAX != BotonCounter){
+		LCD_nokia_send_string(", ");
+	}
 }
+
 void pantalla_RGB_Frecuencia(float Fr) {
 	LCD_nokia_clear();/*! It clears the information printed in the LCD*/
-		//Genera el valor
-		uint8_t FrR0 = (uint8_t) Fr/10;
-		uint8_t FrR1 = (uint8_t) Fr-(FrR0*10);
-		uint8_t FrD0 = (uint8_t) ((Fr-(FrR1+(FrR0*10)))*10);
-		uint8_t FrD1 = (uint8_t) ((Fr-(FrR1+(FrR0*10)))*100)-(FrD0*10);
+	//Genera el valor
+	uint8_t FrR0 = (uint8_t) Fr / 10;
+	uint8_t FrR1 = (uint8_t) Fr - (FrR0 * 10);
+	uint8_t FrD0 = (uint8_t) ((Fr - (FrR1 + (FrR0 * 10))) * 10);
+	uint8_t FrD1 = (uint8_t) ((Fr - (FrR1 + (FrR0 * 10))) * 100) - (FrD0 * 10);
 
-		//Desplegar Pantalla
-		LCD_nokia_goto_xy(0, 1);
-		LCD_nokia_send_string("FRECUENCIA");
-		LCD_nokia_goto_xy(0, 2);
-		LCD_nokia_send_char(intToChar(FrR0));
-		LCD_nokia_send_char(intToChar(FrR1));
-		LCD_nokia_send_char('.');
-		LCD_nokia_send_char(intToChar(FrD0));
-		LCD_nokia_send_char(intToChar(FrD1));
-		LCD_nokia_send_string("KHz");
-		LCD_nokia_goto_xy(0, 3);
-		LCD_nokia_send_string("SW3=ON");
-		LCD_nokia_goto_xy(0, 4);
-		LCD_nokia_send_string("SW2=OFF");
+	//Desplegar Pantalla
+	LCD_nokia_goto_xy(0, 1);
+	LCD_nokia_send_string("FRECUENCIA");
+	LCD_nokia_goto_xy(0, 2);
+	LCD_nokia_send_char(intToChar(FrR0));
+	LCD_nokia_send_char(intToChar(FrR1));
+	LCD_nokia_send_char('.');
+	LCD_nokia_send_char(intToChar(FrD0));
+	LCD_nokia_send_char(intToChar(FrD1));
+	LCD_nokia_send_string("KHz");
+	LCD_nokia_goto_xy(0, 3);
+	LCD_nokia_send_string("SW3=ON");
+	LCD_nokia_goto_xy(0, 4);
+	LCD_nokia_send_string("SW2=OFF");
 }
 
-uint8_t intToChar (uint8_t valor){
-	switch (valor){
+uint8_t intToChar(uint8_t valor) {
+	switch (valor) {
 	case 0:
 		return '0';
 	case 1:
