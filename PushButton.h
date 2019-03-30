@@ -9,10 +9,13 @@
 #define PUSHBUTTON_H_
 
 #include <GPIO.h>
+#include "Bits.h"
 
 //Valor para configurar sw y poner safe values
 #define SW2 0x40
 #define SW3 0x10
+#define PTB2_MASK 0X4
+
 
 /*! These constants are used to select an specific push button*/
 typedef enum{PB_SW2, /*!< Definition to select SW2*/
@@ -28,7 +31,8 @@ typedef enum{PB_SW2, /*!< Definition to select SW2*/
  */
 void PushButton_sw2_config(void);
 void PushButton_sw3_config(void);
-
+void PushButton_external_config(gpio_port_name_t GPIOx, BitsType pin, uint32_t MASK);
+void PushButton_external_handler(void);
 /********************************************************************************************/
 /********************************************************************************************/
 /********************************************************************************************/
