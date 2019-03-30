@@ -139,6 +139,20 @@ void PORTC_IRQHandler() /**Entra cuando ocurre una interrupcion en el puerto C*/
 
 }
 
+void PORTB_IRQHandler() /**Entra cuando ocurre una interrupcion en el puerto C*/
+{
+
+
+	if(gpio_B_callback)
+	{
+		gpio_B_callback();
+	}
+
+
+	GPIO_clear_interrupt(GPIO_C); //reinicia la interrupción
+
+}
+
 void PORTA_IRQHandler(void)
 {
 	uint8_t sw3_state = GPIO_read_pin(GPIO_A, bit_4); //Obtiene el estado del sw2
@@ -270,19 +284,19 @@ uint8_t GPIO_read_pin(gpio_port_name_t portName, uint8_t pin)
 		switch(portName)
 					{
 						case GPIO_A:/** GPIO A is selected*/
-							input_value	= (GPIOA->PDIR) & pin; /**assigns to input_value the value of pin x of PORT A*/
+							input_value	= ((GPIOA->PDIR) >> pin) & TRUE; /**assigns to input_value the value of pin x of PORT A*/
 							break;
 						case GPIO_B:/** GPIO B is selected*/
-							input_value	= GPIOB->PDIR & pin; /**assigns to input_value the value of pin x of PORT B*/
+							input_value	= (GPIOB->PDIR >> pin) & TRUE; /**assigns to input_value the value of pin x of PORT B*/
 							break;
 						case GPIO_C:/** GPIO C is selected*/
-							input_value	= (GPIOC->PDIR) & pin; /**assigns to input_value the value of pin x of PORT C*/
+							input_value	= ((GPIOC->PDIR) >> pin) & TRUE; /**assigns to input_value the value of pin x of PORT C*/
 							break;
 						case GPIO_D:/** GPIO D is selected*/
-							input_value	= GPIOD->PDIR & pin; /**assigns to input_value the value of pin x of PORT D*/
+							input_value	= (GPIOD->PDIR >> pin) & TRUE; /**assigns to input_value the value of pin x of PORT D*/
 							break;
 						case GPIO_E: /** GPIO E is selected*/
-							input_value	= GPIOE->PDIR & pin; /**assigns to input_value the value of pin x of PORT E*/
+							input_value	= (GPIOE->PDIR >> pin) & TRUE; /**assigns to input_value the value of pin x of PORT E*/
 							break;
 						default:/**If doesn't exist the option*/
 							input_value = 0x00000000;
